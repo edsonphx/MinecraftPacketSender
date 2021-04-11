@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="UsernamePacket.cpp">
+      <Filter>Sources\Packets\Outbound</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusPacket.cpp">
+      <Filter>Sources\Packets\Outbound</Filter>
+    </ClCompile>
+    <ClCompile Include="HandShakePacket.cpp">
+      <Filter>Sources\Packets\Outbound</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>Sources\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="RawPacketData.cpp">
+      <Filter>Sources\Socket</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Socket.h">
+      <Filter>Headers\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="RawPacketData.h">
+      <Filter>Headers\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="HandShakePacket.h">
+      <Filter>Headers\Packets\Outbound</Filter>
+    </ClInclude>
+    <ClInclude Include="UsernamePacket.h">
+      <Filter>Headers\Packets\Outbound</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusPacket.h">
+      <Filter>Headers\Packets\Outbound</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{2e0f234d-1944-447c-98d8-472aee1dd345}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{6c7fa829-a984-4563-859f-2568f983b362}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Packets">
+      <UniqueIdentifier>{cdc3a7df-a5a3-42be-ab75-eb5d4a0ca056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Packets\Inbound">
+      <UniqueIdentifier>{795dff49-c97a-4afc-8927-6be4ffbc4922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Packets\Outbound">
+      <UniqueIdentifier>{fdaf9393-d2cc-46a8-bf58-41bc44e1ad34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Socket">
+      <UniqueIdentifier>{d56eb62f-d14b-4741-9394-0111bf249ff8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Socket">
+      <UniqueIdentifier>{7eccdacb-342f-4a7e-843a-9773525d3b83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Packets">
+      <UniqueIdentifier>{47a52762-ce3f-4c73-b6ce-708bf5b5cf8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Packets\Inbound">
+      <UniqueIdentifier>{1d5720bb-018e-4e22-acb1-20d5935b7da1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Packets\Outbound">
+      <UniqueIdentifier>{7cd91de4-9701-43b1-af4a-b8357cf0c780}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

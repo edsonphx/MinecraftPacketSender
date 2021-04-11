@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Packets">
+      <UniqueIdentifier>{6fa16753-526a-4be2-845e-14477586eb52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Packets\Outbound">
+      <UniqueIdentifier>{d2bc7da4-5a7d-43be-9778-8eaa889caea5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Packets\Inbound">
+      <UniqueIdentifier>{4e10201b-a7f4-44df-9a4b-1058aa74dfe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Socket">
+      <UniqueIdentifier>{4e475752-f2ad-4204-b5b7-ccdb4dcbe0c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Socket">
+      <UniqueIdentifier>{bdf73e35-7963-4e2c-9cca-62c61b800838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Packets">
+      <UniqueIdentifier>{6ad627c0-2c64-47e1-aacc-adcb0eb6fa4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Packets\Outbound">
+      <UniqueIdentifier>{10a3447a-a579-4916-b01f-9e4308e27c9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Packets\Inbound">
+      <UniqueIdentifier>{52c3871d-1217-4de7-aca0-4950d1c17dba}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsernamePacket.cpp">
+      <Filter>Source Files\Packets\Outbound</Filter>
+    </ClCompile>
+    <ClCompile Include="HandShakePacket.cpp">
+      <Filter>Source Files\Packets\Outbound</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>Source Files\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="RawPacketData.cpp">
+      <Filter>Source Files\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusPacket.cpp">
+      <Filter>Source Files\Packets\Outbound</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Socket.h">
+      <Filter>Header Files\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="RawPacketData.h">
+      <Filter>Header Files\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="HandShakePacket.h">
+      <Filter>Header Files\Packets\Outbound</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusPacket.h">
+      <Filter>Header Files\Packets\Outbound</Filter>
+    </ClInclude>
+    <ClInclude Include="UsernamePacket.h">
+      <Filter>Header Files\Packets\Outbound</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
