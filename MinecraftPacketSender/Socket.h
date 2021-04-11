@@ -3,6 +3,7 @@
 #include <WS2tcpip.h>
 #include <cstdint>
 #include <thread>
+#include <vector>
 
 class Socket
 {
@@ -37,11 +38,13 @@ private:
 
     void createSocket();
 
-    int readVarInt(char* packet, int* length);
-    long readVarLong(char* packet, int* length);
-    long internalRead(char* packet, int* length, int8_t maxNumRead);
+    int readVarInt(unsigned char* packet, int* length);
+    long readVarLong(unsigned char* packet, int* length);
+    long internalRead(unsigned char* packet, int* length, int8_t maxNumRead);
 
-    void parseMessage(char* packet, int length);
-    char* decompressMessage(char* compressedPacket, int length);
+    void parseMessage(std::vector<unsigned char>* packet);
+
+    template<typename T>
+    void reajustStartIndex(T* arrPtr, int arrSize, int newStartIndex);
 };
 

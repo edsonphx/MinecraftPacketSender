@@ -8,11 +8,16 @@
 #include <iostream>
 #include <thread>
 #include "zlib.h"
+#include <vector>
+#include <iterator>
 
 Socket::Socket(PCSTR server, PCSTR port)
 {
     _server = server;
     _port = port;
+    _isCompressedSet = false;
+    _maxCompressionLength = 0;
+    _socket = 0;
 }
 
 int Socket::getLastError()
@@ -67,116 +72,93 @@ void Socket::stopMessageThread()
 
 void Socket::getMessage()
 {
-    //DEBUG
-    int lastMessageIndex = 0;
-    char lastPacket[32768];
-    //DEBUG
-
-    char buffer[2048];
+    int bufferSize = 2048;
+    char* buffer = new char[2048];
 
     int length = 0;
     int bytesRead = 0;
-
-    int messageIndex = 0;
-    char* message = new char[32768];
-
     
+    std::vector<unsigned char>::iterator messageIterator;
+    std::vector<unsigned char>* message = new std::vector<unsigned char>();
 
     while (isThreadRunning)
     {
         if (bytesRead <= 0)
-            bytesRead = recv(_socket, buffer, sizeof(buffer), 0);
+            bytesRead = recv(_socket, buffer, bufferSize, 0);
 
-        if (bytesRead > sizeof(buffer))
+        if (bytesRead > bufferSize || bytesRead < 0)
             bytesRead = 0;
 
         if (bytesRead > 0)
         {
-            if (length <= 0)
-                length = readVarInt(buffer, &bytesRead);
-
-            int auxLength = length;
-            for(int i = 0; i <= auxLength; i++)
+            if (length <= 0) 
             {
-                message[messageIndex++] = buffer[i];
-
-                bytesRead--;
-                length--;
-
-                if (length <= 0)
-                {
-                    for (int i = 0; i < messageIndex; i++)
-                    {
-                        lastPacket[i] = message[i];
-                    }
-
-                    lastMessageIndex = messageIndex;
-
-                    parseMessage(message, messageIndex);
-
-                    int auxIndex = 0;
-                    for (int i = messageIndex; i < sizeof(buffer); i++)
-                    {
-                        buffer[auxIndex] = buffer[i];
-                        auxIndex++;
-                    }
-
-                    messageIndex = 0;
-
-                    break;
-                }
-
-                if (bytesRead == 0)
-                    break;
+                length = readVarInt((unsigned char*)buffer, &bytesRead);
+                message->resize(length);
+                messageIterator = message->begin();
             }
+
+            int expectedConsumedBytes = 1 + length;
+            if (length > bytesRead)
+                expectedConsumedBytes = bytesRead;
+
+            messageIterator = message->insert(messageIterator, buffer, buffer + expectedConsumedBytes);
+            auto msgBody = message->data();
+
+            bytesRead -= expectedConsumedBytes;
+            length -= expectedConsumedBytes;
+
+            if (bytesRead <= 0) 
+                reajustStartIndex(buffer, bufferSize, expectedConsumedBytes);
+
+            if (length <= 0)
+                parseMessage(message);
         }
         
-        Sleep(30);
+        Sleep(100);
     }
 }
 
-void Socket::parseMessage(char* packet, int lenght) 
+void Socket::parseMessage(std::vector<unsigned char>* packet)
 {
     int packetId = 0;
     bool isThisPacketCompressed = _isCompressedSet;
+    int actualPacketSize = packet->size();
 
     if(_isCompressedSet)
     {
-        int dataLength = readVarInt(packet, &lenght);
+        int dataLength = readVarInt(packet->data(), &actualPacketSize);
         if (dataLength == 0) 
         {
             isThisPacketCompressed = false;
-            packetId = readVarInt(packet, &lenght);
+            packetId = readVarInt(packet->data(), &actualPacketSize);
         }
         else 
         {
-            //char nome[6] = "Edson";
-            //char* buff = new char[100];
+            std::vector<unsigned char> messageDecompressed;
 
-            //z_stream infstream;
-            //infstream.zalloc = Z_NULL;
-            //infstream.zfree = Z_NULL;
-            //infstream.opaque = Z_NULL;
+            messageDecompressed.resize(dataLength);
 
-            //// setup "b" as the input and "c" as the compressed output
-            //infstream.avail_in = 5; // size of input
-            //infstream.next_in = (Bytef*)nome; // input char array
-            //infstream.avail_out = 100; // size of output
-            //infstream.next_out = (Bytef*)buff; // output char array
+            z_stream stream;
+            stream.zalloc = Z_NULL;
+            stream.zfree = Z_NULL;
+            stream.opaque = Z_NULL;
 
-            //// the actual DE-compression work.
-            //deflateInit(&infstream, Z_BEST_COMPRESSION);
-            //deflate(&infstream, Z_FINISH);
-            //deflateEnd(&infstream);
+            stream.avail_in = packet->size();
+            stream.next_in = packet->data();
+            stream.avail_out = messageDecompressed.size();
+            stream.next_out = messageDecompressed.data();
 
-            char* decompressedPacket = decompressMessage(packet, lenght);
-            //dataLength++;
-            //packetId = readVarInt(decompressedPacket, &dataLength);
+            inflateInit(&stream);
+            inflate(&stream, Z_NO_FLUSH);
+            inflateEnd(&stream);
+
+            packetId = readVarInt(messageDecompressed.data(), &dataLength);
         }
     }
     else 
     {
-        packetId = readVarInt(packet, &lenght);
+        packetId = readVarInt(packet->data(), &actualPacketSize);
     }
         
 
@@ -195,7 +177,7 @@ void Socket::parseMessage(char* packet, int lenght)
         {
             //setting compress
             _isCompressedSet = true;
-            _maxCompressionLength = readVarInt(packet, &lenght);
+            _maxCompressionLength = readVarInt(packet->data(), &actualPacketSize);
         }
         break;
     case 0x05:
@@ -209,46 +191,17 @@ void Socket::parseMessage(char* packet, int lenght)
     }
 }
 
-char* Socket::decompressMessage(char* compressedPacket, int length)
-{
-    char* decompressedMessagePtr = new char[0x10000];
-
-    z_stream stream;
-    stream.zalloc = Z_NULL;
-    stream.zfree = Z_NULL;
-    stream.opaque = Z_NULL;
-
-    stream.avail_in = length;
-    stream.next_in = (Bytef*)compressedPacket;
-    stream.avail_out = 0x10000;
-    stream.next_out = (Bytef*)decompressedMessagePtr;
-
-    // the actual DE-compression work.
-    inflateInit(&stream);
-    inflate(&stream, Z_NO_FLUSH);
-    inflateEnd(&stream);
-    
-    char z[10000];//= readVarInt(decompressedMessagePtr, &length);
-
-    for (int i = 0; i < 10000; i++)
-    {
-        z[i] = decompressedMessagePtr[i];
-    }
-
-    return decompressedMessagePtr;
-}
-
-int Socket::readVarInt(char* packet, int* length)
+int Socket::readVarInt(unsigned char* packet, int* length)
 {
     return (uint32_t)internalRead(packet, length, 5);
 }
 
-long Socket::readVarLong(char* packet, int* length)
+long Socket::readVarLong(unsigned char* packet, int* length)
 {
     return internalRead(packet, length, 10);
 }
 
-long Socket::internalRead(char* packet, int* length, int8_t maxNumRead)
+long Socket::internalRead(unsigned char* packet, int* length, int8_t maxNumRead)
 {
     int numRead = 0;
     long result = 0;
@@ -269,12 +222,7 @@ long Socket::internalRead(char* packet, int* length, int8_t maxNumRead)
             return 0xFFFFFFFF;
     };
 
-    int auxIndex = 0;
-    for (int i = numRead; i < *length; i++)
-    {
-        packet[auxIndex] = packet[i];
-        auxIndex++;
-    }
+    reajustStartIndex(packet, *length, numRead);
 
     *length = *length - numRead;
     return result;
@@ -339,4 +287,14 @@ Socket::~Socket()
 {
     delete _server;
     delete _port;
+}
+
+template<typename T>
+void Socket::reajustStartIndex(T* arrPtr, int arrSize, int newStartIndex)
+{
+    int auxIndex = 0;
+    for (int i = newStartIndex; i < arrSize - newStartIndex; i++)
+    {
+        arrPtr[auxIndex++] = arrPtr[i];
+    }
 }
